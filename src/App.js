@@ -1,12 +1,12 @@
 import React from 'react';
 
-import FixtureGrid from './Screens/FixtureGrid/FixtureGrid';
+import GLMainWrapper from './Screens/Main/GLMainWrapper';
 
 class App extends React.Component{
   render() {
     document.title = "Lighting system tool"
     return (  
-      <FixtureGrid />
+      <GLMainWrapper />
       )
   }
 }
