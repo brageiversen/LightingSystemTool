@@ -8,6 +8,11 @@ import { isBrumStyle } from "../../Utils/fixtureGridTools";
 import FixtureData from "../../Mockdata/importexportLights.json";
 import { colDef } from "./Utils/FixtureGridColDef";
 
+import ReportModal from "./Components/ReportModal";
+import ImportModal from "./Components/ImportModal";
+import LabelModal from "./Components/LabelModal";
+import SettingsModal from "./Components/SettingsModal";
+
 import {
   Form,
   FormGroup,
@@ -19,7 +24,7 @@ import {
   Navbar,
   Nav,
   Icon,
-  Dropdown
+  FlexboxGrid,
 } from "rsuite";
 
 class FixtureGrid extends React.Component {
@@ -39,7 +44,16 @@ class FixtureGrid extends React.Component {
         phase2Frac: 0.0,
         phase3Frac: 0.0,
       },
+      showImportModal: false,
+      showReportModal: false,
+      showLabelModal: false,
+      showSettingsModal: false,
     };
+
+    this.showImportModal = this.showImportModal.bind(this);
+    this.showReportModal = this.showReportModal.bind(this);
+    this.showLabelModal = this.showLabelModal.bind(this);
+    this.showSettingsModal = this.showSettingsModal.bind(this);
   }
 
   componentDidMount() {}
@@ -161,9 +175,36 @@ class FixtureGrid extends React.Component {
   }
 
   printPower(p) {
-    let result = `${p.phase1} W (${p.phase1Frac} %),${p.phase2} W (${p.phase2Frac} %), ${p.phase3} W (${p.phase3Frac} %),`;
+    return (
+      <div>
+        <ul>
+          <li>
+            L1: <b>{p.phase1} W</b> ({p.phase1Frac}%)
+          </li>
+          <li>
+            L2: <b>{p.phase2} W</b> ({p.phase2Frac}%)
+          </li>
+          <li>
+            L3: <b>{p.phase3} W</b> ({p.phase3Frac}%)
+          </li>
+        </ul>
+      </div>
+    );
+  }
+  showImportModal() {
+    this.setState({ showImportModal: true });
+  }
 
-    return result;
+  showReportModal() {
+    this.setState({ showReportModal: true });
+  }
+
+  showLabelModal() {
+    this.setState({ showLabelModal: true });
+  }
+
+  showSettingsModal() {
+    this.setState({ showSettingsModal: true });
   }
 
   render() {
@@ -174,23 +215,29 @@ class FixtureGrid extends React.Component {
             <Navbar appearance="subtle">
               <Navbar.Body>
                 <Nav>
-                  <Nav.Item icon={<Icon icon="home" />}>Home</Nav.Item>
-                  <Nav.Item>News</Nav.Item>
-                  <Nav.Item>Products</Nav.Item>
-                  <Dropdown title="About">
-                    <Dropdown.Item>Company</Dropdown.Item>
-                    <Dropdown.Item>Team</Dropdown.Item>
-                    <Dropdown.Item>Contact</Dropdown.Item>
-                  </Dropdown>
+                  <Nav.Item onClick={() => this.showImportModal()}>
+                    Import
+                  </Nav.Item>
+                  <Nav.Item onClick={() => this.showReportModal()}>
+                    Reports
+                  </Nav.Item>
+                  <Nav.Item onClick={() => this.showLabelModal()}>
+                    Labels
+                  </Nav.Item>
                 </Nav>
                 <Nav pullRight>
-                  <Nav.Item icon={<Icon icon="cog" />}>Settings</Nav.Item>
+                  <Nav.Item
+                    onClick={() => this.showSettingsModal()}
+                    icon={<Icon icon="cog" />}
+                  >
+                    Settings
+                  </Nav.Item>
                 </Nav>
               </Navbar.Body>
             </Navbar>
           </Header>
           <Content>
-            <div className="agGridWrapper" style={{ height: "90vh" }}>
+            <div className="agGridWrapper" style={{ height: "81vh" }}>
               <Form>
                 <FormGroup>
                   <Input
@@ -218,9 +265,44 @@ class FixtureGrid extends React.Component {
             </div>
           </Content>
           <Footer>
-            <span>{this.printPower(this.state.selectedPower)}</span>
+            <div>
+              <FlexboxGrid>
+                <FlexboxGrid.Item colspan={6}>
+                  <p style={{ margin: "5px", marginRight: "15px" }}>
+                    <b>Total power</b>
+                  </p>
+                  <div>{this.printPower(this.state.totalPower)}</div>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={6}>
+                  <p style={{ margin: "5px", marginRight: "15px" }}>
+                    <b>Selected power</b>
+                  </p>
+                  <div>{this.printPower(this.state.selectedPower)}</div>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+            </div>
           </Footer>
         </Container>
+
+        <ReportModal
+          show={this.state.showReportModal}
+          onHide={() => this.setState({ showReportModal: false })}
+        />
+
+        <ImportModal
+          show={this.state.showImportModal}
+          onHide={() => this.setState({ showImportModal: false })}
+        />
+
+        <LabelModal
+          show={this.state.showLabelModal}
+          onHide={() => this.setState({ showLabelModal: false })}
+        />
+
+        <SettingsModal
+          show={this.state.showSettingsModal}
+          onHide={() => this.setState({ showSettingsModal: false })}
+        />
       </div>
     );
   }
