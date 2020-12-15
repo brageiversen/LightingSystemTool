@@ -37,3 +37,9 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(53, 53, 53);
 }
+
+.agGridWrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}

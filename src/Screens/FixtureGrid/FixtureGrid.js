@@ -7,7 +7,20 @@ import { AgGridReact } from "ag-grid-react";
 import { isBrumStyle } from "../../Utils/fixtureGridTools";
 import FixtureData from "../../Mockdata/importexportLights.json";
 import { colDef } from "./Utils/FixtureGridColDef";
-import { Form, Row, Col } from "react-bootstrap";
+
+import {
+  Form,
+  FormGroup,
+  Input,
+  Container,
+  Footer,
+  Content,
+  Header,
+  Navbar,
+  Nav,
+  Icon,
+  Dropdown
+} from "rsuite";
 
 class FixtureGrid extends React.Component {
   constructor(props) {
@@ -34,7 +47,7 @@ class FixtureGrid extends React.Component {
   async onGridReady(params) {
     this.gridApi = params.api;
     this.AgGridColumnApi = params.columnApi;
-    
+
     let totalPower = await this.calculatePower();
     this.setState({ totalPower });
     this.gridApi.sizeColumnsToFit();
@@ -92,9 +105,9 @@ class FixtureGrid extends React.Component {
     this.setState({ selectedPower });
   }
 
-  test(e) {
+  quickSearch(value) {
     //console.log(e.target.value);
-    this.gridApi.setQuickFilter(e.target.value);
+    this.gridApi.setQuickFilter(value);
   }
 
   calculatePower() {
@@ -155,39 +168,59 @@ class FixtureGrid extends React.Component {
 
   render() {
     return (
-      <div
-        className="ag-theme-balham-dark"
-        style={{ height: "93vh", width: "100%" }}
-      >
-        <Form>
-          <Row>
-            <Form.Group as={Col} controlId="quicksearch">
-              <Form.Control
-                size="sm"
-                placeholder="Search..."
-                onChange={(e) => this.test(e)}
-              />
-            </Form.Group>
-
-            <Form.Group as={Col} controlId="quicksearch2">
-              {/* <span>{this.printPower(this.state.totalPower)}</span> */}
-              <span>{this.printPower(this.state.selectedPower)}</span>
-            </Form.Group>
-          </Row>
-        </Form>
-
-        <AgGridReact
-          columnDefs={this.state.columnDefs}
-          rowData={this.state.rowData}
-          onGridReady={this.onGridReady.bind(this)}
-          defaultColDef={{
-            resizable: true,
-            sort: true,
-          }}
-          sideBar={true}
-          rowSelection="multiple"
-          onSelectionChanged={this.onSelectionChanged.bind(this)}
-        />
+      <div className="show-container">
+        <Container>
+          <Header>
+            <Navbar appearance="subtle">
+              <Navbar.Body>
+                <Nav>
+                  <Nav.Item icon={<Icon icon="home" />}>Home</Nav.Item>
+                  <Nav.Item>News</Nav.Item>
+                  <Nav.Item>Products</Nav.Item>
+                  <Dropdown title="About">
+                    <Dropdown.Item>Company</Dropdown.Item>
+                    <Dropdown.Item>Team</Dropdown.Item>
+                    <Dropdown.Item>Contact</Dropdown.Item>
+                  </Dropdown>
+                </Nav>
+                <Nav pullRight>
+                  <Nav.Item icon={<Icon icon="cog" />}>Settings</Nav.Item>
+                </Nav>
+              </Navbar.Body>
+            </Navbar>
+          </Header>
+          <Content>
+            <div className="agGridWrapper" style={{ height: "90vh" }}>
+              <Form>
+                <FormGroup>
+                  <Input
+                    size="xs"
+                    placeholder="Search"
+                    onChange={(value) => this.quickSearch(value)}
+                    style={{ width: "100%" }}
+                  />
+                </FormGroup>
+              </Form>
+              <div className="ag-theme-balham-dark" style={{ flex: 1 }}>
+                <AgGridReact
+                  columnDefs={this.state.columnDefs}
+                  rowData={this.state.rowData}
+                  onGridReady={this.onGridReady.bind(this)}
+                  defaultColDef={{
+                    resizable: true,
+                    sort: true,
+                  }}
+                  sideBar={true}
+                  rowSelection="multiple"
+                  onSelectionChanged={this.onSelectionChanged.bind(this)}
+                />
+              </div>
+            </div>
+          </Content>
+          <Footer>
+            <span>{this.printPower(this.state.selectedPower)}</span>
+          </Footer>
+        </Container>
       </div>
     );
   }

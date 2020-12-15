@@ -6,7 +6,8 @@ import "ag-grid-community/dist/styles/ag-theme-balham.css";
 
 import FixtureData from "../../Mockdata/importexportLights.json";
 import { colDef } from "./Utils/DmxListColDef";
-import { Form } from "react-bootstrap";
+
+import { FormGroup, Form, Input } from "rsuite";
 
 class DmxList extends React.Component {
   constructor(props) {
@@ -47,7 +48,6 @@ class DmxList extends React.Component {
     });
 
     this.gridApi.setRowData(dmxList);
-  
   }
 
   onGridReady(params) {
@@ -57,46 +57,43 @@ class DmxList extends React.Component {
     this.getDmxLinesFromFromData();
   }
 
-  test(e) {
-    //console.log(e.target.value);
-    this.gridApi.setQuickFilter(e.target.value);
+  quickSearch(value) {
+    this.gridApi.setQuickFilter(value);
   }
 
-  paginationChanged(){
+  paginationChanged() {
     this.gridApi.sizeColumnsToFit();
   }
 
   render() {
     return (
-      <div
-        className="ag-theme-balham-dark"
-        style={{ height: "100vh", width: "100%", overflow: 'scroll' }}
-      >
-
+      <div className="agGridWrapper" style={{ height: "90vh" }}>
         <Form>
-          <Form.Group controlId="quicksearch">
-            <Form.Control
-              type="sm"
-              placeholder="Search..."
-              onChange={(e) => this.test(e)}
+          <FormGroup>
+            <Input
+              size="xs"
+              placeholder="Search"
+              onChange={(value) => this.quickSearch(value)}
+              style={{ width: "100%" }}
             />
-          </Form.Group>
+          </FormGroup>
         </Form>
-
-        <AgGridReact
-          columnDefs={this.state.columnDefs}
-          rowData={this.state.rowData}
-          onGridReady={this.onGridReady.bind(this)}
-          paginationChanged={this.paginationChanged.bind(this)}
-          defaultColDef={{
-            resizable: true,
-            sort: true,
-          }}
-          sideBar={true}
-          rowSelection="multiple"
-          enterMovesDown={true}
-          enterMovesDownAfterEdit={true}
-        />
+        <div className="ag-theme-balham-dark" style={{ flex: 1 }}>
+          <AgGridReact
+            columnDefs={this.state.columnDefs}
+            rowData={this.state.rowData}
+            onGridReady={this.onGridReady.bind(this)}
+            paginationChanged={this.paginationChanged.bind(this)}
+            defaultColDef={{
+              resizable: true,
+              sort: true,
+            }}
+            sideBar={true}
+            rowSelection="multiple"
+            enterMovesDown={true}
+            enterMovesDownAfterEdit={true}
+          />
+        </div>
       </div>
     );
   }
