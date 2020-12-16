@@ -165,12 +165,11 @@ class FixtureGrid extends React.Component {
       phase2: p2,
       phase3: p3,
       total,
-      phase1Frac: (p1 / total).toFixed(2),
-      phase2Frac: (p2 / total).toFixed(2),
-      phase3Frac: (p3 / total).toFixed(2),
+      phase1Frac: (p1 / total).toFixed(2) * 100,
+      phase2Frac: (p2 / total).toFixed(2) * 100,
+      phase3Frac: (p3 / total).toFixed(2) * 100,
     };
 
-    // this.setState({ totalPower });
     return totalPower;
   }
 
