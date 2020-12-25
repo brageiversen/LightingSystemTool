@@ -48,6 +48,8 @@ class FixtureGrid extends React.Component {
       showReportModal: false,
       showLabelModal: false,
       showSettingsModal: false,
+
+      reportData: [],
     };
 
     this.showImportModal = this.showImportModal.bind(this);
@@ -195,7 +197,17 @@ class FixtureGrid extends React.Component {
   }
 
   showReportModal() {
-    this.setState({ showReportModal: true });
+
+    if(this.gridApi){
+      let reportData = [];
+
+      this.gridApi.forEachNodeAfterFilterAndSort(entry => {
+        reportData.push(entry.data);
+      })
+      this.setState({ showReportModal: true, reportData });
+    }
+
+    
   }
 
   showLabelModal() {
@@ -286,6 +298,7 @@ class FixtureGrid extends React.Component {
         <ReportModal
           show={this.state.showReportModal}
           onHide={() => this.setState({ showReportModal: false })}
+          rowData={this.state.reportData}
         />
 
         <ImportModal
