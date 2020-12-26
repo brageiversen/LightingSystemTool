@@ -6,7 +6,7 @@ import { AgGridReact } from "ag-grid-react";
 
 import { isBrumStyle } from "../../Utils/fixtureGridTools";
 import FixtureData from "../../Mockdata/importexportLights.json";
-import { colDef } from "./Utils/FixtureGridColDef";
+import { colDef, createColDef } from "./Utils/FixtureGridColDef";
 
 import ReportModal from "./Components/ReportModal";
 import ImportModal from "./Components/ImportModal";
@@ -15,16 +15,25 @@ import SettingsModal from "./Components/SettingsModal";
 import FixtureDetailModal from "./Components/FixtureDetailModal";
 import PowerDetailModal from "./Components/PowerDetailModal";
 
-
-
 import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid } from "rsuite";
 
 class FixtureGrid extends React.Component {
   constructor(props) {
     super(props);
 
+    // Coldef params
+    const params = {
+      vwxFixtureData: true,
+      userFixtureData: true,
+      general: true,
+      userFields: false,
+      power: true,
+      vwxCadData: true,
+    };
+
     this.state = {
-      columnDefs: colDef,
+      columnDefs: createColDef(params),
+      colDefParams: params,
       rowData: FixtureData.lightingDevices,
       totalPower: {},
       selectedPower: {
@@ -54,6 +63,8 @@ class FixtureGrid extends React.Component {
     this.addUserModeAndName = this.addUserModeAndName.bind(this);
     this.showPowerDetailModal = this.showPowerDetailModal.bind(this);
     this.addPowerDetails = this.addPowerDetails.bind(this);
+    this.updateColDef = this.updateColDef.bind(this);
+    this.sizeColumnsToFit = this.sizeColumnsToFit.bind(this);
   }
 
   componentDidMount() {}
@@ -277,28 +288,34 @@ class FixtureGrid extends React.Component {
     // console.log(transactionData);
   }
 
-  addPowerDetails(lookup){
+  addPowerDetails(lookup) {
     let transactionData = [];
 
     this.gridApi.forEachNode((node) => {
-
-
       lookup.forEach((entry) => {
-        if(node.data.circuitName === entry.circuitName){
+        if (node.data.circuitName === entry.circuitName) {
           transactionData.push({
             ...node.data,
             circuitType: entry.circuitType,
             phaseSequ: entry.phaseSequ,
-          })
+          });
         }
-
-      })
-      
-    })
+      });
+    });
 
     this.gridApi.applyTransaction({
       update: transactionData,
     });
+  }
+
+  sizeColumnsToFit() {
+    this.gridApi.sizeColumnsToFit();
+  }
+
+  updateColDef(params) {
+    const columnDefs = createColDef(params);
+    this.setState({ columnDefs });
+    // this.gridApi.sizeColumnsToFit();
   }
 
   render() {
@@ -316,6 +333,9 @@ class FixtureGrid extends React.Component {
                   <Nav.Item onClick={() => this.showPowerDetailModal()}>Power Details</Nav.Item>
                 </Nav>
                 <Nav pullRight>
+                  <Nav.Item onClick={() => this.sizeColumnsToFit()} >
+                    Size columns to fit
+                  </Nav.Item>
                   <Nav.Item onClick={() => this.showSettingsModal()} icon={<Icon icon="cog" />}>
                     Settings
                   </Nav.Item>
@@ -384,7 +404,12 @@ class FixtureGrid extends React.Component {
 
         <LabelModal show={this.state.showLabelModal} onHide={() => this.setState({ showLabelModal: false })} />
 
-        <SettingsModal show={this.state.showSettingsModal} onHide={() => this.setState({ showSettingsModal: false })} />
+        <SettingsModal
+          show={this.state.showSettingsModal}
+          onHide={() => this.setState({ showSettingsModal: false })}
+          updateColDef={this.updateColDef}
+          colDefParams={this.state.colDefParams}
+        />
 
         <FixtureDetailModal
           show={this.state.showFixtureDetailModal}

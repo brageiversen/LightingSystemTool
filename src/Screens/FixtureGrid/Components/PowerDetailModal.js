@@ -23,6 +23,8 @@ class PowerDetailModal extends React.Component {
               return "HOT";
             } else if (params.value === 2) {
               return "DIM";
+            } else {
+              return null;
             }
           },
         },
@@ -49,11 +51,13 @@ class PowerDetailModal extends React.Component {
 
     data.forEach((entry) => {
       if ("circuitName" in entry) {
-        let circuitName = entry.circuitName;
+        const circuitName = entry.circuitName;
+        const circuitType = entry.circuitType;
+        const phaseSequ = entry.phaseSequ;
 
         let existsInList = false;
         for (let row of uniqueCircuits) {
-          if (row.circuitName === circuitName) {
+          if (row.circuitName === circuitName && row.circuitType === circuitType && row.phaseSequ === phaseSequ) {
             existsInList = true;
             break;
           }
@@ -61,6 +65,8 @@ class PowerDetailModal extends React.Component {
         if (!existsInList) {
           uniqueCircuits.push({
             circuitName,
+            circuitType,
+            phaseSequ,
           });
         }
       }
@@ -111,19 +117,19 @@ class PowerDetailModal extends React.Component {
   }
 
   addPhaseSequence() {
-    const phaseSequ = "112233"
+    const phaseSequ = "112233";
     const selectedRows = this.gridApi.getSelectedRows();
 
     let updateData = [];
     selectedRows.forEach((node, index) => {
-        updateData.push({
-            ...node, 
-            phaseSequ,
-        })
+      updateData.push({
+        ...node,
+        phaseSequ,
+      });
     });
     this.gridApi.applyTransaction({
-        update: updateData,
-      });
+      update: updateData,
+    });
   }
 
   render() {

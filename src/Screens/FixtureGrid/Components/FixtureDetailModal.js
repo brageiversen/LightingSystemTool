@@ -14,13 +14,13 @@ class FixtureDetailModal extends React.Component {
           sort: "asc",
         },
         {
+          headerName: "Fixture Mode (VWX)",
+          field: "fixtureMode",
+        },
+        {
           headerName: "User Instrument Type",
           field: "userInstrumentType",
           editable: true,
-        },
-        {
-          headerName: "Fixture Mode (VWX)",
-          field: "fixtureMode",
         },
         {
           headerName: "User Fixture Mode",
@@ -43,14 +43,18 @@ class FixtureDetailModal extends React.Component {
 
     data.forEach((entry) => {
       if ("instrumentType" in entry) {
-        let instrumentType = entry.instrumentType;
-        let fixtureMode = entry.fixtureMode;
+        const instrumentType = entry.instrumentType;
+        const fixtureMode = entry.fixtureMode;
+        const userInstrumentType = entry.userInstrumentType;
+        const userFixtureMode = entry.userFixtureMode;
 
         let existsInList = false;
         for (let row of uniqueFixturesAndModes) {
           if (
             row.instrumentType === instrumentType &&
-            row.fixtureMode === fixtureMode
+            row.fixtureMode === fixtureMode &&
+            row.userInstrumentType === userInstrumentType &&
+            row.userFixtureMode === userFixtureMode
           ) {
             existsInList = true;
             break;
@@ -60,6 +64,8 @@ class FixtureDetailModal extends React.Component {
           uniqueFixturesAndModes.push({
             instrumentType,
             fixtureMode,
+            userInstrumentType,
+            userFixtureMode,
           });
         }
       }
@@ -91,10 +97,7 @@ class FixtureDetailModal extends React.Component {
         </Modal.Header>
 
         <Modal.Body>
-          <div
-            className="ag-theme-balham-dark"
-            style={{ flex: 1, height: "600px" }}
-          >
+          <div className="ag-theme-balham-dark" style={{ flex: 1, height: "600px" }}>
             <AgGridReact
               columnDefs={this.state.columnDefs}
               rowData={this.state.rowData}
@@ -103,6 +106,8 @@ class FixtureDetailModal extends React.Component {
                 resizable: true,
                 sortable: true,
               }}
+              singleClickEdit={true}
+              enterMovesDownAfterEdit={true}
               rowSelection="single"
               // onSelectionChanged={this.onSelectionChanged.bind(this)}
             />
