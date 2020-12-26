@@ -12,20 +12,12 @@ import ReportModal from "./Components/ReportModal";
 import ImportModal from "./Components/ImportModal";
 import LabelModal from "./Components/LabelModal";
 import SettingsModal from "./Components/SettingsModal";
+import FixtureDetailModal from "./Components/FixtureDetailModal";
+import PowerDetailModal from "./Components/PowerDetailModal";
 
-import {
-  Form,
-  FormGroup,
-  Input,
-  Container,
-  Footer,
-  Content,
-  Header,
-  Navbar,
-  Nav,
-  Icon,
-  FlexboxGrid,
-} from "rsuite";
+
+
+import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid } from "rsuite";
 
 class FixtureGrid extends React.Component {
   constructor(props) {
@@ -48,14 +40,20 @@ class FixtureGrid extends React.Component {
       showReportModal: false,
       showLabelModal: false,
       showSettingsModal: false,
+      showPowerDetailModal: false,
 
       reportData: [],
+      fixtureDetailData: [],
     };
 
     this.showImportModal = this.showImportModal.bind(this);
     this.showReportModal = this.showReportModal.bind(this);
     this.showLabelModal = this.showLabelModal.bind(this);
     this.showSettingsModal = this.showSettingsModal.bind(this);
+    this.showFixtureDetailModal = this.showFixtureDetailModal.bind(this);
+    this.addUserModeAndName = this.addUserModeAndName.bind(this);
+    this.showPowerDetailModal = this.showPowerDetailModal.bind(this);
+    this.addPowerDetails = this.addPowerDetails.bind(this);
   }
 
   componentDidMount() {}
@@ -131,7 +129,7 @@ class FixtureGrid extends React.Component {
     let p2 = 0;
     let p3 = 0;
 
-    this.gridApi.forEachNode((node, index) => {
+    this.gridApi.forEachNode((node) => {
       let circuitNumber = parseInt(node.data.circuitNumber);
       if (Number.isNaN(circuitNumber)) return;
 
@@ -197,17 +195,14 @@ class FixtureGrid extends React.Component {
   }
 
   showReportModal() {
-
-    if(this.gridApi){
+    if (this.gridApi) {
       let reportData = [];
 
-      this.gridApi.forEachNodeAfterFilterAndSort(entry => {
+      this.gridApi.forEachNodeAfterFilterAndSort((entry) => {
         reportData.push(entry.data);
-      })
+      });
       this.setState({ showReportModal: true, reportData });
     }
-
-    
   }
 
   showLabelModal() {
@@ -218,6 +213,94 @@ class FixtureGrid extends React.Component {
     this.setState({ showSettingsModal: true });
   }
 
+  showFixtureDetailModal() {
+    if (this.gridApi) {
+      let fixtureDetailData = [];
+      this.gridApi.forEachNodeAfterFilterAndSort((entry) => {
+        fixtureDetailData.push(entry.data);
+      });
+      this.setState({ showFixtureDetailModal: true, fixtureDetailData });
+    }
+  }
+  showPowerDetailModal() {
+    if (this.gridApi) {
+      let fixtureDetailData = [];
+      this.gridApi.forEachNodeAfterFilterAndSort((entry) => {
+        fixtureDetailData.push(entry.data);
+      });
+      this.setState({ showPowerDetailModal: true, fixtureDetailData });
+    }
+  }
+
+  addUserModeAndName(lookup) {
+    let transactionData = [];
+
+    this.gridApi.forEachNode((node) => {
+      const instrumentType = node.data.instrumentType;
+      const fixtureMode = node.data.fixtureMode;
+      const userInstrumentType = node.data.userInstrumentType;
+      const userFixtureMode = node.data.userFixtureMode;
+
+      lookup.forEach((entry) => {
+        // Add user fixture type
+        if (entry.instrumentType === instrumentType && entry.fixtureMode === fixtureMode) {
+          let updatedNode = node.data;
+
+          let dataToUpdate = false;
+
+          if ("userInstrumentType" in entry && entry.userInstrumentType !== userInstrumentType) {
+            updatedNode = {
+              ...updatedNode,
+              userInstrumentType: entry.userInstrumentType,
+            };
+            dataToUpdate = true;
+          }
+
+          if ("userFixtureMode" in entry && entry.userFixtureMode !== userFixtureMode) {
+            updatedNode = {
+              ...updatedNode,
+              userFixtureMode: entry.userFixtureMode,
+            };
+            dataToUpdate = true;
+          }
+
+          if (dataToUpdate) {
+            transactionData.push(updatedNode);
+          }
+        }
+      });
+    });
+
+    this.gridApi.applyTransaction({
+      update: transactionData,
+    });
+    // console.log(transactionData);
+  }
+
+  addPowerDetails(lookup){
+    let transactionData = [];
+
+    this.gridApi.forEachNode((node) => {
+
+
+      lookup.forEach((entry) => {
+        if(node.data.circuitName === entry.circuitName){
+          transactionData.push({
+            ...node.data,
+            circuitType: entry.circuitType,
+            phaseSequ: entry.phaseSequ,
+          })
+        }
+
+      })
+      
+    })
+
+    this.gridApi.applyTransaction({
+      update: transactionData,
+    });
+  }
+
   render() {
     return (
       <div className="show-container">
@@ -226,21 +309,14 @@ class FixtureGrid extends React.Component {
             <Navbar appearance="subtle">
               <Navbar.Body>
                 <Nav>
-                  <Nav.Item onClick={() => this.showImportModal()}>
-                    Import
-                  </Nav.Item>
-                  <Nav.Item onClick={() => this.showReportModal()}>
-                    Reports
-                  </Nav.Item>
-                  <Nav.Item onClick={() => this.showLabelModal()}>
-                    Labels
-                  </Nav.Item>
+                  <Nav.Item onClick={() => this.showImportModal()}>Import</Nav.Item>
+                  <Nav.Item onClick={() => this.showReportModal()}>Reports</Nav.Item>
+                  <Nav.Item onClick={() => this.showLabelModal()}>Labels</Nav.Item>
+                  <Nav.Item onClick={() => this.showFixtureDetailModal()}>Fixture Details</Nav.Item>
+                  <Nav.Item onClick={() => this.showPowerDetailModal()}>Power Details</Nav.Item>
                 </Nav>
                 <Nav pullRight>
-                  <Nav.Item
-                    onClick={() => this.showSettingsModal()}
-                    icon={<Icon icon="cog" />}
-                  >
+                  <Nav.Item onClick={() => this.showSettingsModal()} icon={<Icon icon="cog" />}>
                     Settings
                   </Nav.Item>
                 </Nav>
@@ -261,6 +337,9 @@ class FixtureGrid extends React.Component {
               </Form>
               <div className="ag-theme-balham-dark" style={{ flex: 1 }}>
                 <AgGridReact
+                  getRowNodeId={(data) => {
+                    return data.__UID;
+                  }}
                   columnDefs={this.state.columnDefs}
                   rowData={this.state.rowData}
                   onGridReady={this.onGridReady.bind(this)}
@@ -301,19 +380,24 @@ class FixtureGrid extends React.Component {
           rowData={this.state.reportData}
         />
 
-        <ImportModal
-          show={this.state.showImportModal}
-          onHide={() => this.setState({ showImportModal: false })}
+        <ImportModal show={this.state.showImportModal} onHide={() => this.setState({ showImportModal: false })} />
+
+        <LabelModal show={this.state.showLabelModal} onHide={() => this.setState({ showLabelModal: false })} />
+
+        <SettingsModal show={this.state.showSettingsModal} onHide={() => this.setState({ showSettingsModal: false })} />
+
+        <FixtureDetailModal
+          show={this.state.showFixtureDetailModal}
+          onHide={() => this.setState({ showFixtureDetailModal: false })}
+          fixtureDetailData={this.state.fixtureDetailData}
+          addUserModeAndName={this.addUserModeAndName}
         />
 
-        <LabelModal
-          show={this.state.showLabelModal}
-          onHide={() => this.setState({ showLabelModal: false })}
-        />
-
-        <SettingsModal
-          show={this.state.showSettingsModal}
-          onHide={() => this.setState({ showSettingsModal: false })}
+        <PowerDetailModal
+          show={this.state.showPowerDetailModal}
+          onHide={() => this.setState({ showPowerDetailModal: false })}
+          fixtureDetailData={this.state.fixtureDetailData}
+          addPowerDetails={this.addPowerDetails}
         />
       </div>
     );
