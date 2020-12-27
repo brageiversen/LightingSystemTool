@@ -14,6 +14,7 @@ import LabelModal from "./Components/LabelModal";
 import SettingsModal from "./Components/SettingsModal";
 import FixtureDetailModal from "./Components/FixtureDetailModal";
 import PowerDetailModal from "./Components/PowerDetailModal";
+import LibraryModal from "./Components/LibraryModal";
 
 import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid } from "rsuite";
 
@@ -50,6 +51,7 @@ class FixtureGrid extends React.Component {
       showLabelModal: false,
       showSettingsModal: false,
       showPowerDetailModal: false,
+      showLibraryModal: false,
 
       reportData: [],
       fixtureDetailData: [],
@@ -107,12 +109,31 @@ class FixtureGrid extends React.Component {
 
       if (Number.isNaN(wattage)) return;
 
-      if (circuitNumber === 1 || circuitNumber === 4) {
-        p1 += wattage;
-      } else if (circuitNumber === 2 || circuitNumber === 5) {
-        p2 += wattage;
-      } else if (circuitNumber === 3 || circuitNumber === 6) {
-        p3 += wattage;
+      if ("phaseSequ" in node && node.phaseSequ) {
+        const phaseSequ = node.phaseSequ;
+        if (phaseSequ.length === 6) {
+          // If there is 6 letters in phase sequenc
+          const phase = parseInt(phaseSequ.charAt(circuitNumber - 1));
+
+          // If the phase is valid. E.g: 1,2 or 3.
+          if (phase === 1) {
+            p1 += wattage;
+          }
+          if (phase === 2) {
+            p2 += wattage;
+          }
+          if (phase === 3) {
+            p3 += wattage;
+          }
+        }
+      } else {
+        if (circuitNumber === 1 || circuitNumber === 4) {
+          p1 += wattage;
+        } else if (circuitNumber === 2 || circuitNumber === 5) {
+          p2 += wattage;
+        } else if (circuitNumber === 3 || circuitNumber === 6) {
+          p3 += wattage;
+        }
       }
     });
 
@@ -160,12 +181,32 @@ class FixtureGrid extends React.Component {
 
       if (Number.isNaN(wattage)) return;
 
-      if (circuitNumber === 1 || circuitNumber === 4) {
-        p1 += wattage;
-      } else if (circuitNumber === 2 || circuitNumber === 5) {
-        p2 += wattage;
-      } else if (circuitNumber === 3 || circuitNumber === 6) {
-        p3 += wattage;
+      if ("phaseSequ" in node.data && node.data.phaseSequ) {
+        const phaseSequ = node.data.phaseSequ;
+        if (phaseSequ.length === 6) {
+          // If there is 6 letters in phase sequenc
+          const phase = parseInt(phaseSequ.charAt(circuitNumber - 1));
+
+          // If the phase is valid. E.g: 1,2 or 3.
+          if (phase === 1) {
+            p1 += wattage;
+          }
+          if (phase === 2) {
+            p2 += wattage;
+          }
+          if (phase === 3) {
+            p3 += wattage;
+          }
+        }
+      } else {
+        // No defined phase sequ. Fallback to 123123
+        if (circuitNumber === 1 || circuitNumber === 4) {
+          p1 += wattage;
+        } else if (circuitNumber === 2 || circuitNumber === 5) {
+          p2 += wattage;
+        } else if (circuitNumber === 3 || circuitNumber === 6) {
+          p3 += wattage;
+        }
       }
     });
 
@@ -241,6 +282,10 @@ class FixtureGrid extends React.Component {
       });
       this.setState({ showPowerDetailModal: true, fixtureDetailData });
     }
+  }
+
+  showLibraryModal() {
+    this.setState({ showLibraryModal: true });
   }
 
   addUserModeAndName(lookup) {
@@ -331,11 +376,10 @@ class FixtureGrid extends React.Component {
                   <Nav.Item onClick={() => this.showLabelModal()}>Labels</Nav.Item>
                   <Nav.Item onClick={() => this.showFixtureDetailModal()}>Fixture Details</Nav.Item>
                   <Nav.Item onClick={() => this.showPowerDetailModal()}>Power Details</Nav.Item>
+                  <Nav.Item onClick={() => this.showLibraryModal()}>Library</Nav.Item>
                 </Nav>
                 <Nav pullRight>
-                  <Nav.Item onClick={() => this.sizeColumnsToFit()} >
-                    Size columns to fit
-                  </Nav.Item>
+                  <Nav.Item onClick={() => this.sizeColumnsToFit()}>Size columns to fit</Nav.Item>
                   <Nav.Item onClick={() => this.showSettingsModal()} icon={<Icon icon="cog" />}>
                     Settings
                   </Nav.Item>
@@ -424,6 +468,8 @@ class FixtureGrid extends React.Component {
           fixtureDetailData={this.state.fixtureDetailData}
           addPowerDetails={this.addPowerDetails}
         />
+
+        <LibraryModal show={this.state.showLibraryModal} onHide={() => this.setState({ showLibraryModal: false })} />
       </div>
     );
   }
