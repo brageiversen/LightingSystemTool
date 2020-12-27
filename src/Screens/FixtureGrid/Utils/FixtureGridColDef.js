@@ -205,7 +205,7 @@ export const colDef = [vwxFixtureData, userFixtureData, general, userFields, pow
 
 // Possible to turn on and off fields. 
 /*
-params = {
+const params = {
   vwxFixtureData: true, 
   userFixtureData: true, 
   general: true, 

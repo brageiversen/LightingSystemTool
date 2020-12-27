@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Button } from "rsuite";
+import { Modal, Button, Form, FormGroup, Input } from "rsuite";
 import { AgGridReact } from "ag-grid-react";
 
 class FixtureDetailModal extends React.Component {
@@ -97,20 +97,32 @@ class FixtureDetailModal extends React.Component {
         </Modal.Header>
 
         <Modal.Body>
-          <div className="ag-theme-balham-dark" style={{ flex: 1, height: "600px" }}>
-            <AgGridReact
-              columnDefs={this.state.columnDefs}
-              rowData={this.state.rowData}
-              onGridReady={this.onGridReady.bind(this)}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-              }}
-              singleClickEdit={true}
-              enterMovesDownAfterEdit={true}
-              rowSelection="single"
-              // onSelectionChanged={this.onSelectionChanged.bind(this)}
-            />
+          <div className="agGridWrapper" style={{ height: "600px" }}>
+            <Form>
+              <FormGroup>
+                <Input
+                  size="xs"
+                  placeholder="Search"
+                  onChange={(value) => this.gridApi.setQuickFilter(value)}
+                  style={{ width: "100%" }}
+                />
+              </FormGroup>
+            </Form>
+            <div className="ag-theme-balham-dark" style={{ flex: 1 }}>
+              <AgGridReact
+                columnDefs={this.state.columnDefs}
+                rowData={this.state.rowData}
+                onGridReady={this.onGridReady.bind(this)}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                }}
+                singleClickEdit={true}
+                enterMovesDownAfterEdit={true}
+                rowSelection="single"
+                // onSelectionChanged={this.onSelectionChanged.bind(this)}
+              />
+            </div>
           </div>
         </Modal.Body>
 
