@@ -6,7 +6,7 @@ import { AgGridReact } from "ag-grid-react";
 
 import { isBrumStyle } from "../../Utils/fixtureGridTools";
 import FixtureData from "../../Mockdata/importexportLights.json";
-import { colDef, createColDef } from "./Utils/FixtureGridColDef";
+import {createColDef } from "./Utils/FixtureGridColDef";
 
 import ReportModal from "./Components/ReportModal";
 import ImportModal from "./Components/ImportModal";
