@@ -1,3 +1,5 @@
+import {CIRCUIT_TYPE_DIM,CIRCUIT_TYPE_HOT} from './constants';
+
 export function circuitComparator(input1, input2) {
   let circuit1 = isBrumStyle(input1);
   let circuit2 = isBrumStyle(input2);
@@ -64,7 +66,7 @@ export function isBrumStyle(circuit) {
 
   // Check if circuit starts with H or D
   if (type === "H" || type === "D") {
-    let typeAsNumber = type === "H" ? 0 : 1;
+    let typeAsNumber = type === "H" ? CIRCUIT_TYPE_HOT : CIRCUIT_TYPE_DIM;
     // get dimmercity number
     let dc = parseInt(circuit.substring(1, 2));
 

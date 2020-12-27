@@ -1,13 +1,9 @@
 import React from "react";
-import "ag-grid-community/dist/styles/ag-grid.css";
-import "ag-grid-community/dist/styles/ag-theme-balham-dark.css";
-import "ag-grid-community/dist/styles/ag-theme-balham.css";
 import { AgGridReact } from "ag-grid-react";
-
-import { isBrumStyle } from "../../Utils/fixtureGridTools";
+import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid } from "rsuite";
+import { calculatePower, printPower } from "./Helpers/PowerCalculation/powerCalculation";
+import { createColDef } from "./Utils/FixtureGridColDef";
 import FixtureData from "../../Mockdata/importexportLights.json";
-import {createColDef } from "./Utils/FixtureGridColDef";
-
 import ReportModal from "./Components/ReportModal";
 import ImportModal from "./Components/ImportModal";
 import LabelModal from "./Components/LabelModal";
@@ -16,7 +12,6 @@ import FixtureDetailModal from "./Components/FixtureDetailModal";
 import PowerDetailModal from "./Components/PowerDetailModal";
 import LibraryModal from "./Components/LibraryModal";
 
-import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid } from "rsuite";
 
 class FixtureGrid extends React.Component {
   constructor(props) {
@@ -75,173 +70,47 @@ class FixtureGrid extends React.Component {
     this.gridApi = params.api;
     this.AgGridColumnApi = params.columnApi;
 
-    let totalPower = await this.calculatePower();
+    let totalPower = await this.calculateTotalPower();
     this.setState({ totalPower });
     this.gridApi.sizeColumnsToFit();
   }
 
   async onSelectionChanged() {
     let selectedRows = this.gridApi.getSelectedRows();
-
-    let p1 = 0;
-    let p2 = 0;
-    let p3 = 0;
-
-    selectedRows.forEach((node, index) => {
-      let circuitNumber = parseInt(node.circuitNumber);
-      if (Number.isNaN(circuitNumber)) return;
-
-      let circuitType = isBrumStyle(node.circuitName).typeAsNumber;
-
-      if (circuitType === 1) return;
-
-      let rawWattage = node.wattage;
-      let wattage = 0;
-      if (rawWattage.indexOf("W") !== -1) {
-        // We have a W in our wattage
-        wattage = parseInt(rawWattage.substring(0, rawWattage.indexOf("W")));
-      } else if (rawWattage.indexOf("w") !== -1) {
-        // We have a w in our wattage
-        wattage = parseInt(rawWattage.substring(0, rawWattage.indexOf("W")));
-      } else {
-        wattage = parseInt(rawWattage);
-      }
-
-      if (Number.isNaN(wattage)) return;
-
-      if ("phaseSequ" in node && node.phaseSequ) {
-        const phaseSequ = node.phaseSequ;
-        if (phaseSequ.length === 6) {
-          // If there is 6 letters in phase sequenc
-          const phase = parseInt(phaseSequ.charAt(circuitNumber - 1));
-
-          // If the phase is valid. E.g: 1,2 or 3.
-          if (phase === 1) {
-            p1 += wattage;
-          }
-          if (phase === 2) {
-            p2 += wattage;
-          }
-          if (phase === 3) {
-            p3 += wattage;
-          }
-        }
-      } else {
-        if (circuitNumber === 1 || circuitNumber === 4) {
-          p1 += wattage;
-        } else if (circuitNumber === 2 || circuitNumber === 5) {
-          p2 += wattage;
-        } else if (circuitNumber === 3 || circuitNumber === 6) {
-          p3 += wattage;
-        }
-      }
-    });
-
-    let total = p1 + p2 + p3;
-
-    let selectedPower = {
-      phase1: p1,
-      phase2: p2,
-      phase3: p3,
-      total,
-      phase1Frac: ((p1 / total) * 100).toFixed(0),
-      phase2Frac: ((p2 / total) * 100).toFixed(0),
-      phase3Frac: ((p3 / total) * 100).toFixed(0),
-    };
+    const selectedPower = await calculatePower(selectedRows);
     this.setState({ selectedPower });
   }
 
+  async onRowDataUpdated() {
+    if(this.gridApi){
+      let totalPower = await this.calculateTotalPower();
+      this.setState({ totalPower });
+    }
+
+  }
+
+  async onRowDataChanged() {
+    if(this.gridApi){
+      let totalPower = await this.calculateTotalPower();
+      this.setState({ totalPower });
+    }
+  }
+
   quickSearch(value) {
-    //console.log(e.target.value);
     this.gridApi.setQuickFilter(value);
   }
 
-  calculatePower() {
-    let p1 = 0;
-    let p2 = 0;
-    let p3 = 0;
+  async calculateTotalPower() {
+    let powerData = [];
 
-    this.gridApi.forEachNode((node) => {
-      let circuitNumber = parseInt(node.data.circuitNumber);
-      if (Number.isNaN(circuitNumber)) return;
+    this.gridApi.forEachNode((node)=>{
+      powerData.push(node.data);
+    })
 
-      //  let circuitType =
-
-      let rawWattage = node.data.wattage;
-      let wattage = 0;
-      if (rawWattage.indexOf("W") !== -1) {
-        // We have a W in our wattage
-        wattage = parseInt(rawWattage.substring(0, rawWattage.indexOf("W")));
-      } else if (rawWattage.indexOf("w") !== -1) {
-        // We have a w in our wattage
-        wattage = parseInt(rawWattage.substring(0, rawWattage.indexOf("W")));
-      } else {
-        wattage = parseInt(rawWattage);
-      }
-
-      if (Number.isNaN(wattage)) return;
-
-      if ("phaseSequ" in node.data && node.data.phaseSequ) {
-        const phaseSequ = node.data.phaseSequ;
-        if (phaseSequ.length === 6) {
-          // If there is 6 letters in phase sequenc
-          const phase = parseInt(phaseSequ.charAt(circuitNumber - 1));
-
-          // If the phase is valid. E.g: 1,2 or 3.
-          if (phase === 1) {
-            p1 += wattage;
-          }
-          if (phase === 2) {
-            p2 += wattage;
-          }
-          if (phase === 3) {
-            p3 += wattage;
-          }
-        }
-      } else {
-        // No defined phase sequ. Fallback to 123123
-        if (circuitNumber === 1 || circuitNumber === 4) {
-          p1 += wattage;
-        } else if (circuitNumber === 2 || circuitNumber === 5) {
-          p2 += wattage;
-        } else if (circuitNumber === 3 || circuitNumber === 6) {
-          p3 += wattage;
-        }
-      }
-    });
-
-    let total = p1 + p2 + p3;
-
-    let totalPower = {
-      phase1: p1,
-      phase2: p2,
-      phase3: p3,
-      total,
-      phase1Frac: (p1 / total).toFixed(2) * 100,
-      phase2Frac: (p2 / total).toFixed(2) * 100,
-      phase3Frac: (p3 / total).toFixed(2) * 100,
-    };
-
+    const totalPower = await calculatePower(powerData);
     return totalPower;
   }
 
-  printPower(p) {
-    return (
-      <div>
-        <ul>
-          <li>
-            L1: <b>{p.phase1} W</b> ({p.phase1Frac}%)
-          </li>
-          <li>
-            L2: <b>{p.phase2} W</b> ({p.phase2Frac}%)
-          </li>
-          <li>
-            L3: <b>{p.phase3} W</b> ({p.phase3Frac}%)
-          </li>
-        </ul>
-      </div>
-    );
-  }
   showImportModal() {
     this.setState({ showImportModal: true });
   }
@@ -414,6 +283,8 @@ class FixtureGrid extends React.Component {
                   sideBar={true}
                   rowSelection="multiple"
                   onSelectionChanged={this.onSelectionChanged.bind(this)}
+                  onRowDataChanged= {this.onRowDataChanged.bind(this)}
+                  onRowDataUpdated= {this.onRowDataUpdated.bind(this)}
                 />
               </div>
             </div>
@@ -425,13 +296,13 @@ class FixtureGrid extends React.Component {
                   <p style={{ margin: "5px", marginRight: "15px" }}>
                     <b>Total power</b>
                   </p>
-                  <div>{this.printPower(this.state.totalPower)}</div>
+                  <div>{printPower(this.state.totalPower)}</div>
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={6}>
                   <p style={{ margin: "5px", marginRight: "15px" }}>
                     <b>Selected power</b>
                   </p>
-                  <div>{this.printPower(this.state.selectedPower)}</div>
+                  <div>{printPower(this.state.selectedPower)}</div>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
             </div>
