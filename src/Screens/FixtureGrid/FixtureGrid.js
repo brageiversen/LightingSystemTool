@@ -1,9 +1,8 @@
 import React from "react";
 import { AgGridReact } from "ag-grid-react";
-import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid } from "rsuite";
+import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid, Dropdown } from "rsuite";
 import { calculatePower, printPower } from "./Helpers/PowerCalculation/powerCalculation";
 import { createColDef } from "./Utils/FixtureGridColDef";
-import FixtureData from "../../Mockdata/importexportLights.json";
 import ReportModal from "./Components/ReportModal";
 import ImportModal from "./Components/ImportModal";
 import ExportModal from "./Components/ExportModal";
@@ -32,7 +31,6 @@ class FixtureGrid extends React.Component {
     this.state = {
       columnDefs: createColDef(params),
       colDefParams: params,
-      // rowData: FixtureData.lightingDevices,
       rowData: [],
       totalPower: {},
       selectedPower: {
@@ -45,7 +43,7 @@ class FixtureGrid extends React.Component {
         phase3Frac: 0.0,
       },
       showImportModal: false,
-      showExportModal: false, 
+      showExportModal: false,
       showReportModal: false,
       showLabelModal: false,
       showSettingsModal: false,
@@ -69,14 +67,15 @@ class FixtureGrid extends React.Component {
     this.sizeColumnsToFit = this.sizeColumnsToFit.bind(this);
     this.addNewLightingData = this.addNewLightingData.bind(this);
     this.downloadData = this.downloadData.bind(this);
+    this.saveColumnState = this.saveColumnState.bind(this);
   }
 
   componentDidMount() {}
 
   async onGridReady(params) {
     this.gridApi = params.api;
-    this.AgGridColumnApi = params.columnApi;
-
+    this.columnApi = params.columnApi;
+    this.getFixtureDataFromLocalstorage();
     let totalPower = await this.calculateTotalPower();
     this.setState({ totalPower });
     this.gridApi.sizeColumnsToFit();
@@ -278,6 +277,30 @@ class FixtureGrid extends React.Component {
     }
   }
 
+  saveColumnState() {
+    const savedState = this.columnApi.getColumnState();
+
+    localStorage.setItem("fixtureGridSettings", JSON.stringify(savedState));
+  }
+
+  getColumnState() {
+    const state = localStorage.getItem("fixtureGridSettings");
+
+    const newState = JSON.parse(state);
+
+    this.columnApi.applyColumnState({ state: newState });
+  }
+
+  getFixtureDataFromLocalstorage() {
+    if (this.gridApi) {
+      const stringData = localStorage.getItem("fixtureData");
+      if (stringData) {
+        const lightingDevices = JSON.parse(stringData);
+        this.gridApi.setRowData(lightingDevices);
+      }
+    }
+  }
+
   render() {
     return (
       <div className="show-container">
@@ -286,8 +309,10 @@ class FixtureGrid extends React.Component {
             <Navbar appearance="subtle">
               <Navbar.Body>
                 <Nav>
-                  <Nav.Item onClick={() => this.showImportModal()}>Import</Nav.Item>
-                  <Nav.Item onClick={() => this.showExportModal()}>Export</Nav.Item>
+                  <Dropdown title="Import/Export">
+                    <Dropdown.Item onSelect={() => this.showImportModal()}>Import</Dropdown.Item>
+                    <Dropdown.Item onSelect={() => this.showExportModal()}>Export</Dropdown.Item>
+                  </Dropdown>
                   <Nav.Item onClick={() => this.showReportModal()}>Reports</Nav.Item>
                   <Nav.Item onClick={() => this.showLabelModal()}>Labels</Nav.Item>
                   <Nav.Item onClick={() => this.showFixtureDetailModal()}>Fixture Details</Nav.Item>
@@ -368,9 +393,9 @@ class FixtureGrid extends React.Component {
           addNewLightingData={this.addNewLightingData}
         />
 
-        <ExportModal 
+        <ExportModal
           show={this.state.showExportModal}
-          onHide={() => this.setState({showExportModal: false})}
+          onHide={() => this.setState({ showExportModal: false })}
           downloadData={this.downloadData}
         />
 
@@ -381,6 +406,7 @@ class FixtureGrid extends React.Component {
           onHide={() => this.setState({ showSettingsModal: false })}
           updateColDef={this.updateColDef}
           colDefParams={this.state.colDefParams}
+          saveColumnState={this.saveColumnState}
         />
 
         <FixtureDetailModal

@@ -161,16 +161,6 @@ class PowerDetailModal extends React.Component {
                 />
               </FormGroup>
             </Form>
-            <Form>
-                <FormGroup>
-                  <Input
-                    size="xs"
-                    placeholder="Search"
-                    onChange={(value) => this.gridApi.setQuickFilter(value)}
-                    style={{ width: "100%" }}
-                  />
-                </FormGroup>
-              </Form>
             <div className="ag-theme-balham-dark" style={{ flex: 1 }}>
               <AgGridReact
                 getRowNodeId={(data) => {

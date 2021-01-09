@@ -16,6 +16,7 @@ class SettingsModal extends React.Component {
   submit() {
     this.props.updateColDef(this.state.colDefParams);
     this.props.onHide();
+    
   }
 
   handleChecked(checked,field) {

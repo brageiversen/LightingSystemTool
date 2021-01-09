@@ -53,10 +53,10 @@ class ImportModal extends React.Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button appearance="primary" onClick={this.downloadData}>
+          <Button appearance="subtle" onClick={this.downloadData}>
             Export Data
           </Button>
-          <Button appearance="primary" onClick={this.props.onHide}>
+          <Button appearance="subtle" onClick={this.props.onHide}>
             Quit
           </Button>
         </Modal.Footer>

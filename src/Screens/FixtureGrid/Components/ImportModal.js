@@ -1,7 +1,6 @@
 import React, { createRef } from "react";
 import { Modal, Button } from "rsuite";
 
-
 class ImportModal extends React.Component {
   fileInputRef = createRef(null);
 
@@ -15,7 +14,7 @@ class ImportModal extends React.Component {
     };
     this.uploadFile = this.uploadFile.bind(this);
     this.applyData = this.applyData.bind(this);
-    this.downloadData = this.downloadData.bind(this);
+    this.saveFixtureDataToLocalstorage = this.saveFixtureDataToLocalstorage.bind(this);
   }
 
   uploadFile(event) {
@@ -57,13 +56,15 @@ class ImportModal extends React.Component {
     }
   }
 
-  applyData() {
-    this.props.addNewLightingData(this.state.lightingDevices);
-    this.props.onHide();
+  saveFixtureDataToLocalstorage(data) {
+    localStorage.setItem("fixtureData", JSON.stringify(data));
   }
 
-  downloadData() {
-    this.props.downloadData(); 
+  applyData() {
+    const data = this.state.lightingDevices
+    this.props.addNewLightingData(data);
+    this.props.onHide();
+    this.saveFixtureDataToLocalstorage(data);
   }
 
   render() {
