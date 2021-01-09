@@ -6,11 +6,14 @@ import { createColDef } from "./Utils/FixtureGridColDef";
 import FixtureData from "../../Mockdata/importexportLights.json";
 import ReportModal from "./Components/ReportModal";
 import ImportModal from "./Components/ImportModal";
+import ExportModal from "./Components/ExportModal";
 import LabelModal from "./Components/LabelModal";
 import SettingsModal from "./Components/SettingsModal";
 import FixtureDetailModal from "./Components/FixtureDetailModal";
 import PowerDetailModal from "./Components/PowerDetailModal";
 import LibraryModal from "./Components/LibraryModal";
+import { saveAs } from "file-saver";
+import moment from "moment";
 
 class FixtureGrid extends React.Component {
   constructor(props) {
@@ -42,6 +45,7 @@ class FixtureGrid extends React.Component {
         phase3Frac: 0.0,
       },
       showImportModal: false,
+      showExportModal: false, 
       showReportModal: false,
       showLabelModal: false,
       showSettingsModal: false,
@@ -53,6 +57,7 @@ class FixtureGrid extends React.Component {
     };
 
     this.showImportModal = this.showImportModal.bind(this);
+    this.showExportModal = this.showExportModal.bind(this);
     this.showReportModal = this.showReportModal.bind(this);
     this.showLabelModal = this.showLabelModal.bind(this);
     this.showSettingsModal = this.showSettingsModal.bind(this);
@@ -63,6 +68,7 @@ class FixtureGrid extends React.Component {
     this.updateColDef = this.updateColDef.bind(this);
     this.sizeColumnsToFit = this.sizeColumnsToFit.bind(this);
     this.addNewLightingData = this.addNewLightingData.bind(this);
+    this.downloadData = this.downloadData.bind(this);
   }
 
   componentDidMount() {}
@@ -113,6 +119,10 @@ class FixtureGrid extends React.Component {
 
   showImportModal() {
     this.setState({ showImportModal: true });
+  }
+
+  showExportModal() {
+    this.setState({ showExportModal: true });
   }
 
   showReportModal() {
@@ -238,6 +248,36 @@ class FixtureGrid extends React.Component {
     }
   }
 
+  downloadData(filename) {
+    if (this.gridApi) {
+      let lightingDevices = [];
+
+      this.gridApi.forEachNodeAfterFilterAndSort((entry) => {
+        lightingDevices.push(entry.data);
+      });
+
+      const data = {
+        info: [
+          {
+            source: "LST",
+            fileName: filename,
+            exportDate: moment().format("DD.MM.YYYY"),
+            exportTime: moment().format("HH:mm"),
+            fixtureCount: lightingDevices.length,
+          },
+        ],
+        lightingDevices,
+      };
+
+      const fileToDownload = new Blob([JSON.stringify(data, undefined, 2)], {
+        type: "application/JSON",
+        name: filename,
+      });
+
+      saveAs(fileToDownload, filename);
+    }
+  }
+
   render() {
     return (
       <div className="show-container">
@@ -247,6 +287,7 @@ class FixtureGrid extends React.Component {
               <Navbar.Body>
                 <Nav>
                   <Nav.Item onClick={() => this.showImportModal()}>Import</Nav.Item>
+                  <Nav.Item onClick={() => this.showExportModal()}>Export</Nav.Item>
                   <Nav.Item onClick={() => this.showReportModal()}>Reports</Nav.Item>
                   <Nav.Item onClick={() => this.showLabelModal()}>Labels</Nav.Item>
                   <Nav.Item onClick={() => this.showFixtureDetailModal()}>Fixture Details</Nav.Item>
@@ -321,7 +362,17 @@ class FixtureGrid extends React.Component {
           rowData={this.state.reportData}
         />
 
-        <ImportModal show={this.state.showImportModal} onHide={() => this.setState({ showImportModal: false })} addNewLightingData={this.addNewLightingData}/>
+        <ImportModal
+          show={this.state.showImportModal}
+          onHide={() => this.setState({ showImportModal: false })}
+          addNewLightingData={this.addNewLightingData}
+        />
+
+        <ExportModal 
+          show={this.state.showExportModal}
+          onHide={() => this.setState({showExportModal: false})}
+          downloadData={this.downloadData}
+        />
 
         <LabelModal show={this.state.showLabelModal} onHide={() => this.setState({ showLabelModal: false })} />
 

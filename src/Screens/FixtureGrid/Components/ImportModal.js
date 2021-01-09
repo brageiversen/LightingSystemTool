@@ -1,6 +1,7 @@
 import React, { createRef } from "react";
 import { Modal, Button } from "rsuite";
 
+
 class ImportModal extends React.Component {
   fileInputRef = createRef(null);
 
@@ -14,6 +15,7 @@ class ImportModal extends React.Component {
     };
     this.uploadFile = this.uploadFile.bind(this);
     this.applyData = this.applyData.bind(this);
+    this.downloadData = this.downloadData.bind(this);
   }
 
   uploadFile(event) {
@@ -57,19 +59,23 @@ class ImportModal extends React.Component {
 
   applyData() {
     this.props.addNewLightingData(this.state.lightingDevices);
-    this.props.onHide(); 
+    this.props.onHide();
+  }
+
+  downloadData() {
+    this.props.downloadData(); 
   }
 
   render() {
     return (
-      <Modal show={this.props.show} onHide={this.props.onHide} size="lg">
+      <Modal show={this.props.show} onHide={this.props.onHide} size="sm">
         <Modal.Header>
           <h3>Import Data</h3>
         </Modal.Header>
 
         <Modal.Body>
           <Button appearance="primary" onClick={() => this.fileInputRef.current.click()}>
-            Upload data
+            Import data
           </Button>
           <input
             type="file"
@@ -79,7 +85,6 @@ class ImportModal extends React.Component {
             hidden
             accept="application/JSON"
           />
-          <p></p>
           <ul>
             {this.state.info.map((entry) => {
               return (
@@ -92,7 +97,9 @@ class ImportModal extends React.Component {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button appearance="subtle" onClick={this.applyData}>Ok</Button>
+          <Button appearance="subtle" onClick={this.applyData}>
+            Ok
+          </Button>
           <Button appearance="subtle" onClick={this.props.onHide}>
             Quit
           </Button>
