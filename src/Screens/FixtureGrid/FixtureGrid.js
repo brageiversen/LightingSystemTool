@@ -12,7 +12,6 @@ import FixtureDetailModal from "./Components/FixtureDetailModal";
 import PowerDetailModal from "./Components/PowerDetailModal";
 import LibraryModal from "./Components/LibraryModal";
 
-
 class FixtureGrid extends React.Component {
   constructor(props) {
     super(props);
@@ -30,7 +29,8 @@ class FixtureGrid extends React.Component {
     this.state = {
       columnDefs: createColDef(params),
       colDefParams: params,
-      rowData: FixtureData.lightingDevices,
+      // rowData: FixtureData.lightingDevices,
+      rowData: [],
       totalPower: {},
       selectedPower: {
         phase1: 0,
@@ -62,6 +62,7 @@ class FixtureGrid extends React.Component {
     this.addPowerDetails = this.addPowerDetails.bind(this);
     this.updateColDef = this.updateColDef.bind(this);
     this.sizeColumnsToFit = this.sizeColumnsToFit.bind(this);
+    this.addNewLightingData = this.addNewLightingData.bind(this);
   }
 
   componentDidMount() {}
@@ -82,15 +83,14 @@ class FixtureGrid extends React.Component {
   }
 
   async onRowDataUpdated() {
-    if(this.gridApi){
+    if (this.gridApi) {
       let totalPower = await this.calculateTotalPower();
       this.setState({ totalPower });
     }
-
   }
 
   async onRowDataChanged() {
-    if(this.gridApi){
+    if (this.gridApi) {
       let totalPower = await this.calculateTotalPower();
       this.setState({ totalPower });
     }
@@ -103,9 +103,9 @@ class FixtureGrid extends React.Component {
   async calculateTotalPower() {
     let powerData = [];
 
-    this.gridApi.forEachNode((node)=>{
+    this.gridApi.forEachNode((node) => {
       powerData.push(node.data);
-    })
+    });
 
     const totalPower = await calculatePower(powerData);
     return totalPower;
@@ -232,6 +232,12 @@ class FixtureGrid extends React.Component {
     // this.gridApi.sizeColumnsToFit();
   }
 
+  addNewLightingData(lightingData) {
+    if (this.gridApi) {
+      this.gridApi.setRowData(lightingData);
+    }
+  }
+
   render() {
     return (
       <div className="show-container">
@@ -283,8 +289,8 @@ class FixtureGrid extends React.Component {
                   sideBar={true}
                   rowSelection="multiple"
                   onSelectionChanged={this.onSelectionChanged.bind(this)}
-                  onRowDataChanged= {this.onRowDataChanged.bind(this)}
-                  onRowDataUpdated= {this.onRowDataUpdated.bind(this)}
+                  onRowDataChanged={this.onRowDataChanged.bind(this)}
+                  onRowDataUpdated={this.onRowDataUpdated.bind(this)}
                 />
               </div>
             </div>
@@ -315,7 +321,7 @@ class FixtureGrid extends React.Component {
           rowData={this.state.reportData}
         />
 
-        <ImportModal show={this.state.showImportModal} onHide={() => this.setState({ showImportModal: false })} />
+        <ImportModal show={this.state.showImportModal} onHide={() => this.setState({ showImportModal: false })} addNewLightingData={this.addNewLightingData}/>
 
         <LabelModal show={this.state.showLabelModal} onHide={() => this.setState({ showLabelModal: false })} />
 
