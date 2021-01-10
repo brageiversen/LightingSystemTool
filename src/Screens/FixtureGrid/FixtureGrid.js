@@ -1,6 +1,19 @@
 import React from "react";
 import { AgGridReact } from "ag-grid-react";
-import { Form, FormGroup, Input, Container, Footer, Content, Header, Navbar, Nav, Icon, FlexboxGrid, Dropdown } from "rsuite";
+import {
+  Form,
+  FormGroup,
+  Input,
+  Container,
+  Footer,
+  Content,
+  Header,
+  Navbar,
+  Nav,
+  Icon,
+  FlexboxGrid,
+  Dropdown,
+} from "rsuite";
 import { calculatePower, printPower } from "./Helpers/PowerCalculation/powerCalculation";
 import { createColDef } from "./Utils/FixtureGridColDef";
 import ReportModal from "./Components/ReportModal";
@@ -65,9 +78,11 @@ class FixtureGrid extends React.Component {
     this.addPowerDetails = this.addPowerDetails.bind(this);
     this.updateColDef = this.updateColDef.bind(this);
     this.sizeColumnsToFit = this.sizeColumnsToFit.bind(this);
-    this.addNewLightingData = this.addNewLightingData.bind(this);
+    this.overwriteData = this.overwriteData.bind(this);
+    this.mergeData = this.mergeData.bind(this);
     this.downloadData = this.downloadData.bind(this);
     this.saveColumnState = this.saveColumnState.bind(this);
+    this.getRowData = this.getRowData.bind(this);
   }
 
   componentDidMount() {}
@@ -241,9 +256,19 @@ class FixtureGrid extends React.Component {
     // this.gridApi.sizeColumnsToFit();
   }
 
-  addNewLightingData(lightingData) {
+  overwriteData(data) {
     if (this.gridApi) {
-      this.gridApi.setRowData(lightingData);
+      this.gridApi.setRowData(data);
+    }
+  }
+
+  mergeData(data){
+    if(this.gridApi){
+      this.gridApi.applyTransaction({
+        add: data.add,
+        update: data.update,
+        delete: data.delete,
+      })
     }
   }
 
@@ -299,6 +324,19 @@ class FixtureGrid extends React.Component {
         this.gridApi.setRowData(lightingDevices);
       }
     }
+  }
+
+  getRowData() {
+    return new Promise((resolve, reject) => {
+      if (this.gridApi) {
+        let rowData = [];
+        this.gridApi.forEachNode((node) => {
+          rowData.push(node.data);
+        });
+        resolve(rowData);
+      }
+      reject("No data");
+    });
   }
 
   render() {
@@ -390,7 +428,9 @@ class FixtureGrid extends React.Component {
         <ImportModal
           show={this.state.showImportModal}
           onHide={() => this.setState({ showImportModal: false })}
-          addNewLightingData={this.addNewLightingData}
+          mergeData={this.mergeData}
+          overwriteData={this.overwriteData}
+          getRowData={this.getRowData}
         />
 
         <ExportModal

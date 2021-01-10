@@ -43,3 +43,9 @@ code {
   display: flex;
   flex-direction: column;
 }
+
+
+
+.rs-input[disabled] {
+  color: #e6e6e6 !important;
+}
