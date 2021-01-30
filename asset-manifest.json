@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/LightingSystemTool/static/css/main.daf3b01c.chunk.css",
+    "main.js": "/LightingSystemTool/static/js/main.987edcbe.chunk.js",
+    "main.js.map": "/LightingSystemTool/static/js/main.987edcbe.chunk.js.map",
+    "runtime-main.js": "/LightingSystemTool/static/js/runtime-main.04021287.js",
+    "runtime-main.js.map": "/LightingSystemTool/static/js/runtime-main.04021287.js.map",
+    "static/css/2.365bb4d8.chunk.css": "/LightingSystemTool/static/css/2.365bb4d8.chunk.css",
+    "static/js/2.6b0a9249.chunk.js": "/LightingSystemTool/static/js/2.6b0a9249.chunk.js",
+    "static/js/2.6b0a9249.chunk.js.map": "/LightingSystemTool/static/js/2.6b0a9249.chunk.js.map",
+    "index.html": "/LightingSystemTool/index.html",
+    "precache-manifest.44a7640825b46e0d989adeb2bb8c2e7f.js": "/LightingSystemTool/precache-manifest.44a7640825b46e0d989adeb2bb8c2e7f.js",
+    "service-worker.js": "/LightingSystemTool/service-worker.js",
+    "static/css/2.365bb4d8.chunk.css.map": "/LightingSystemTool/static/css/2.365bb4d8.chunk.css.map",
+    "static/css/main.daf3b01c.chunk.css.map": "/LightingSystemTool/static/css/main.daf3b01c.chunk.css.map",
+    "static/js/2.6b0a9249.chunk.js.LICENSE.txt": "/LightingSystemTool/static/js/2.6b0a9249.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.04021287.js",
+    "static/css/2.365bb4d8.chunk.css",
+    "static/js/2.6b0a9249.chunk.js",
+    "static/css/main.daf3b01c.chunk.css",
+    "static/js/main.987edcbe.chunk.js"
+  ]
+}
