@@ -1,6 +1,6 @@
 import React from "react";
 import { isBrumStyle } from "../../../../Utils/fixtureGridTools";
-import { CIRCUIT_TYPE_DIM } from "../../../../Utils/constants";
+import { CIRCUIT_TYPE_DIM, CIRCUIT_TYPE_HOT } from "../../../../Utils/constants";
 
 const parsePatch = (patch, delimiter) => {
   if (patch.includes(delimiter)) {
@@ -14,18 +14,23 @@ const parsePatch = (patch, delimiter) => {
   return null;
 };
 
-export const calculatePower = (rows) => {
+export const calculatePower = (rows, dimmerAddressAndUniverse) => {
   return new Promise((resolve, reject) => {
     let p1 = 0;
     let p2 = 0;
     let p3 = 0;
 
     rows.forEach((node) => {
-      let circuitNumber = parseInt(node.circuitNumber);
+      let circuitNumber = 0;
 
-      if (Number.isNaN(circuitNumber)) reject("Not a number");
+      // Get circuit type from circuitType, or from brumStyle notation, or nothing..
 
-      let circuitType = isBrumStyle(node.circuitName).typeAsNumber;
+      let circuitType = 0;
+      if ("circuitType" in node) {
+        circuitType = node.circuitType;
+      } else if (isBrumStyle(node.circuitName)) {
+        circuitType = isBrumStyle(node.circuitName).typeAsNumber;
+      }
 
       // Extract power from data:
       let rawWattage = node.wattage;
@@ -44,55 +49,65 @@ export const calculatePower = (rows) => {
       // Something went wrong. Wattage is not a number
       if (Number.isNaN(wattage)) reject("Not a number");
 
-      // DIM POWER
-      if (circuitType === CIRCUIT_TYPE_DIM) {
-      
-        // Hard coded values for dimmer for testing
-        /// TODO: Get these from redux or what not.. 
-        const startAddress = 1;
-        const universe = 15;
-        const numberOfChannels = 48;
+      // Be sure that this is a valid circuitType
+      if (circuitType === CIRCUIT_TYPE_HOT || circuitType === CIRCUIT_TYPE_DIM) {
+        // HOT POWER
+        if (circuitType === CIRCUIT_TYPE_HOT) {
+          circuitNumber = parseInt(node.circuitNumber);
+          if (Number.isNaN(circuitNumber)) reject("Not a number");
+        }
 
-        // Get address and universe from the current fixture
-        const dmx = parsePatch(node.patch, ".");
+        // DIM POWER
+        if (circuitType === CIRCUIT_TYPE_DIM) {
+          // Hard coded values for dimmer for testing
+          /// TODO: Get these from redux or what not..
+          const startAddress = dimmerAddressAndUniverse.address;
+          const universe = dimmerAddressAndUniverse.universe;
+          const numberOfChannels = dimmerAddressAndUniverse.numberOfChannels;
 
-        // Correct universe
-        if (dmx.universe === universe) {
-          // Within the range of the dimmer
-          if (dmx.address < startAddress + numberOfChannels && dmx.address >= startAddress) {
-            const dimmerChannel = dmx.address - startAddress;
-            const dimmerChannelAsCircuitNumber = (dimmerChannel % 6) + 1;
+          // Get address and universe from the current fixture
+          const dmx = parsePatch(node.patch, ".");
 
-            circuitNumber = dimmerChannelAsCircuitNumber;
+          // Correct universe
+          if (dmx.universe === universe) {
+            // Within the range of the dimmer
+            if (dmx.address < startAddress + numberOfChannels && dmx.address >= startAddress) {
+              const dimmerChannel = dmx.address - startAddress;
+              const dimmerChannelAsCircuitNumber = (dimmerChannel % 6) + 1;
+
+              circuitNumber = dimmerChannelAsCircuitNumber;
+            }
           }
         }
-      }
 
-      if ("phaseSequ" in node && node.phaseSequ) {
-        const phaseSequ = node.phaseSequ;
-        if (phaseSequ.length === 6) {
-          // If there is 6 letters in phase sequenc
-          const phase = parseInt(phaseSequ.charAt(circuitNumber - 1));
+        if ("phaseSequ" in node && node.phaseSequ) {
+          const phaseSequ = node.phaseSequ;
+          if (phaseSequ.length === 6) {
+            // If there is 6 letters in phase sequenc
+            const phase = parseInt(phaseSequ.charAt(circuitNumber - 1));
 
-          // If the phase is valid. E.g: 1,2 or 3.
-          if (phase === 1) {
+            // If the phase is valid. E.g: 1,2 or 3.
+            if (phase === 1) {
+              p1 += wattage;
+            }
+            if (phase === 2) {
+              p2 += wattage;
+            }
+            if (phase === 3) {
+              p3 += wattage;
+            }
+          }
+        } else {
+          if (circuitNumber === 1 || circuitNumber === 4) {
             p1 += wattage;
-          }
-          if (phase === 2) {
+          } else if (circuitNumber === 2 || circuitNumber === 5) {
             p2 += wattage;
-          }
-          if (phase === 3) {
+          } else if (circuitNumber === 3 || circuitNumber === 6) {
             p3 += wattage;
           }
         }
-      } else {
-        if (circuitNumber === 1 || circuitNumber === 4) {
-          p1 += wattage;
-        } else if (circuitNumber === 2 || circuitNumber === 5) {
-          p2 += wattage;
-        } else if (circuitNumber === 3 || circuitNumber === 6) {
-          p3 += wattage;
-        }
+      }else{
+        reject("Missing circuit type")
       }
     });
 
@@ -125,7 +140,7 @@ export const printPower = (p) => {
           L3: <b>{p.phase3} W</b> ({p.phase3Frac}%)
         </li>
         <li>
-          Total: <b>{p.total} W</b> 
+          Total: <b>{p.total} W</b>
         </li>
       </ul>
     </div>

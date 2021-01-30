@@ -24,6 +24,7 @@ import SettingsModal from "./Components/SettingsModal";
 import FixtureDetailModal from "./Components/FixtureDetailModal";
 import PowerDetailModal from "./Components/PowerDetailModal";
 import LibraryModal from "./Components/LibraryModal";
+import DimmerSettingsModal from "./Components/DimmerSettingsModal";
 import { saveAs } from "file-saver";
 import moment from "moment";
 
@@ -62,9 +63,10 @@ class FixtureGrid extends React.Component {
       showSettingsModal: false,
       showPowerDetailModal: false,
       showLibraryModal: false,
-
+      showDimmerSettingsModal: false,
       reportData: [],
       fixtureDetailData: [],
+      dimmerAddressAndUniverse: { universe: 0, address: 0, numberOfChannels: 0 },
     };
 
     this.showImportModal = this.showImportModal.bind(this);
@@ -75,6 +77,7 @@ class FixtureGrid extends React.Component {
     this.showFixtureDetailModal = this.showFixtureDetailModal.bind(this);
     this.addUserModeAndName = this.addUserModeAndName.bind(this);
     this.showPowerDetailModal = this.showPowerDetailModal.bind(this);
+    this.showDimmerSettingsModal = this.showDimmerSettingsModal.bind(this);
     this.addPowerDetails = this.addPowerDetails.bind(this);
     this.updateColDef = this.updateColDef.bind(this);
     this.sizeColumnsToFit = this.sizeColumnsToFit.bind(this);
@@ -83,6 +86,7 @@ class FixtureGrid extends React.Component {
     this.downloadData = this.downloadData.bind(this);
     this.saveColumnState = this.saveColumnState.bind(this);
     this.getRowData = this.getRowData.bind(this);
+    this.setDimmerAddressAndUniverse = this.setDimmerAddressAndUniverse.bind(this);
   }
 
   componentDidMount() {}
@@ -98,7 +102,7 @@ class FixtureGrid extends React.Component {
 
   async onSelectionChanged() {
     let selectedRows = this.gridApi.getSelectedRows();
-    const selectedPower = await calculatePower(selectedRows);
+    const selectedPower = await calculatePower(selectedRows, this.state.dimmerAddressAndUniverse);
     this.setState({ selectedPower });
   }
 
@@ -127,7 +131,7 @@ class FixtureGrid extends React.Component {
       powerData.push(node.data);
     });
 
-    const totalPower = await calculatePower(powerData);
+    const totalPower = await calculatePower(powerData, this.state.dimmerAddressAndUniverse);
     return totalPower;
   }
 
@@ -156,6 +160,10 @@ class FixtureGrid extends React.Component {
 
   showSettingsModal() {
     this.setState({ showSettingsModal: true });
+  }
+
+  showDimmerSettingsModal() {
+    this.setState({ showDimmerSettingsModal: true });
   }
 
   showFixtureDetailModal() {
@@ -262,13 +270,13 @@ class FixtureGrid extends React.Component {
     }
   }
 
-  mergeData(data){
-    if(this.gridApi){
+  mergeData(data) {
+    if (this.gridApi) {
       this.gridApi.applyTransaction({
         add: data.add,
         update: data.update,
         delete: data.delete,
-      })
+      });
     }
   }
 
@@ -339,6 +347,10 @@ class FixtureGrid extends React.Component {
     });
   }
 
+  setDimmerAddressAndUniverse(dimmerAddressAndUniverse) {
+    this.setState({ dimmerAddressAndUniverse }, () => this.onRowDataUpdated());
+  }
+
   render() {
     return (
       <div className="show-container">
@@ -352,11 +364,13 @@ class FixtureGrid extends React.Component {
                     <Dropdown.Item onSelect={() => this.showExportModal()}>Export</Dropdown.Item>
                   </Dropdown>
                   <Nav.Item onClick={() => this.showReportModal()}>Reports</Nav.Item>
-                  <Nav.Item onClick={() => this.showLabelModal()}>Labels</Nav.Item>
+                  {/* <Nav.Item onClick={() => this.showLabelModal()}>Labels</Nav.Item> */}
                   <Nav.Item onClick={() => this.showFixtureDetailModal()}>Fixture Details</Nav.Item>
                   <Nav.Item onClick={() => this.showPowerDetailModal()}>Power Details</Nav.Item>
                   <Nav.Item onClick={() => this.showLibraryModal()}>Library</Nav.Item>
+                  <Nav.Item onClick={() => this.showDimmerSettingsModal()}>Dimmer Settings</Nav.Item>
                 </Nav>
+
                 <Nav pullRight>
                   <Nav.Item onClick={() => this.sizeColumnsToFit()}>Size columns to fit</Nav.Item>
                   <Nav.Item onClick={() => this.showSettingsModal()} icon={<Icon icon="cog" />}>
@@ -461,6 +475,13 @@ class FixtureGrid extends React.Component {
           onHide={() => this.setState({ showPowerDetailModal: false })}
           fixtureDetailData={this.state.fixtureDetailData}
           addPowerDetails={this.addPowerDetails}
+        />
+
+        <DimmerSettingsModal
+          show={this.state.showDimmerSettingsModal}
+          onHide={() => this.setState({ showDimmerSettingsModal: false })}
+          dimmerAddressAndUniverse={this.state.dimmerAddressAndUniverse}
+          setDimmerAddressAndUniverse={this.setDimmerAddressAndUniverse}
         />
 
         <LibraryModal show={this.state.showLibraryModal} onHide={() => this.setState({ showLibraryModal: false })} />

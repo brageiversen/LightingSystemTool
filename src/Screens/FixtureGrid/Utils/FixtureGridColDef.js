@@ -4,7 +4,9 @@ import {
   circuitComparator,
   dmxLineComparator,
   stringNumberComparator,
+  circuitTypeCellRenderer
 } from "../../../Utils/fixtureGridTools";
+
 
 const vwxFixtureData = {
   headerName: "VWX Fixture Data",
@@ -155,15 +157,7 @@ const power = {
     {
       headerName: "Circuit Type",
       field: "circuitType",
-      cellRenderer: (params) => {
-        if (params.value === 1) {
-          return "HOT";
-        } else if (params.value === 2) {
-          return "DIM";
-        } else {
-          return null;
-        }
-      },
+      cellRenderer: circuitTypeCellRenderer,
     },
     {
       headerName: "Phase sequence",
@@ -203,7 +197,7 @@ const vwxCadData = {
 // All fields
 export const colDef = [vwxFixtureData, userFixtureData, general, userFields, power, vwxCadData];
 
-// Possible to turn on and off fields. 
+// Possible to turn on and off fields.
 /*
 const params = {
   vwxFixtureData: true, 

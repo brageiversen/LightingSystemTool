@@ -28,38 +28,38 @@ let config = {
               component: "FixtureGrid",
               title: "Fixtures",
             },
-            {
-              type: "row",
-              title: "Cableplan",
-              content: [
-                {
-                  type: "react-component",
-                  component: "SocaList",
-                  title: "Soca List"
-                },
-                {
-                  type: "react-component",
-                  component: "DmxList",
-                  title: "DMX List"
-                },
+            // {
+            //   type: "row",
+            //   title: "Cableplan",
+            //   content: [
+            //     {
+            //       type: "react-component",
+            //       component: "SocaList",
+            //       title: "Soca List"
+            //     },
+            //     {
+            //       type: "react-component",
+            //       component: "DmxList",
+            //       title: "DMX List"
+            //     },
 
-              ]
-            },
-            {
-              type: "react-component",
-              component: "TrussGrid",
-              title: "Truss",
-            },
-            {
-              type: "react-component",
-              component: "HoistGrid",
-              title: "Hoists",
-            },
-            {
-              type: "react-component",
-              component: "ScaffGrid",
-              title: "Scaff",
-            },
+            //   ]
+            // },
+            // {
+            //   type: "react-component",
+            //   component: "TrussGrid",
+            //   title: "Truss",
+            // },
+            // {
+            //   type: "react-component",
+            //   component: "HoistGrid",
+            //   title: "Hoists",
+            // },
+            // {
+            //   type: "react-component",
+            //   component: "ScaffGrid",
+            //   title: "Scaff",
+            // },
 
           ],
         },

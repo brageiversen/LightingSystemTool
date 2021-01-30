@@ -215,3 +215,16 @@ export function stringNumberComparator(val1, val2) {
   
   return v1 - v2;
 }
+
+
+export const circuitTypeCellRenderer = (params) => {
+    if (params.value !== undefined && params.value !== null) {
+      if (params.value.toString() === "1") {
+        return "HOT";
+      } else if (params.value.toString() === "2") {
+        return "DIM";
+      }
+    }
+    return null;
+  }
+

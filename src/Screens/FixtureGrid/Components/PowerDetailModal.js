@@ -1,7 +1,9 @@
 import React from "react";
-import { Modal, Button, Form, FormGroup, Input } from "rsuite";
+import { Modal, Button, Form, FormGroup, Input, SelectPicker } from "rsuite";
 import { AgGridReact } from "ag-grid-react";
-import { circuitNameComparator } from "../../../Utils/fixtureGridTools";
+import { circuitNameComparator, circuitTypeCellRenderer } from "../../../Utils/fixtureGridTools";
+import { circuitTypes } from "../../../Utils/constants";
+
 class PowerDetailModal extends React.Component {
   constructor(props) {
     super(props);
@@ -18,15 +20,7 @@ class PowerDetailModal extends React.Component {
           headerName: "Circuit Type",
           field: "circuitType",
           editable: true,
-          cellRenderer: (params) => {
-            if (params.value === 1) {
-              return "HOT";
-            } else if (params.value === 2) {
-              return "DIM";
-            } else {
-              return null;
-            }
-          },
+          cellRenderer: circuitTypeCellRenderer,
         },
         {
           headerName: "Phase Sequence",
@@ -34,11 +28,14 @@ class PowerDetailModal extends React.Component {
           editable: true,
         },
       ],
+      circuitType: 0,
+      phaseSequ: "",
     };
 
     this.quickSearch = this.quickSearch.bind(this);
     this.submit = this.submit.bind(this);
     this.addPhaseSequence = this.addPhaseSequence.bind(this);
+    this.addCircuitTypeSequence = this.addCircuitTypeSequence.bind(this);
   }
 
   async onGridReady(params) {
@@ -117,7 +114,7 @@ class PowerDetailModal extends React.Component {
   }
 
   addPhaseSequence() {
-    const phaseSequ = "112233";
+    const phaseSequ = this.state.phaseSequ;
     const selectedRows = this.gridApi.getSelectedRows();
 
     let updateData = [];
@@ -132,6 +129,22 @@ class PowerDetailModal extends React.Component {
     });
   }
 
+  addCircuitTypeSequence(circuitType) {
+    const selectedRows = this.gridApi.getSelectedRows();
+
+    let updateData = [];
+    selectedRows.forEach((node, index) => {
+      updateData.push({
+        ...node,
+        circuitType,
+      });
+    });
+    this.gridApi.applyTransaction({
+      update: updateData,
+    });
+    this.setState({circuitType})
+  }
+
   render() {
     return (
       <Modal show={this.props.show} onHide={this.props.onHide} size="lg">
@@ -144,13 +157,27 @@ class PowerDetailModal extends React.Component {
             <Form>
               <FormGroup>
                 <FormGroup>
-                  <Button appearance="subtle" onClick={() => this.assumeCircuitType()}>
-                    Assume circuit
-                  </Button>
+                  <SelectPicker 
+                    style={{width: 250}}
+                    data={circuitTypes} 
+                    value={this.state.circuitType}
+                    onChange={(circuitType) => this.addCircuitTypeSequence(circuitType)}
+                    searchable={false}
+                    cleanable={false}
+                    labelKey="title"
+                    valueKey="value"
+                  />
                 </FormGroup>
+
                 <FormGroup>
+                  <Input
+                    placeholder="Phase sequence"
+                    onChange={(phaseSequ) => this.setState({ phaseSequ })}
+                    style={{ width: 250 }}
+                    value={this.state.phaseSequ}
+                  />
                   <Button appearance="subtle" onClick={() => this.addPhaseSequence()}>
-                    Phase Sequence
+                    Add to selected
                   </Button>
                 </FormGroup>
                 <Input
