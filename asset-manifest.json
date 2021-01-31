@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/LightingSystemTool/static/css/main.daf3b01c.chunk.css",
-    "main.js": "/LightingSystemTool/static/js/main.0f3255b3.chunk.js",
-    "main.js.map": "/LightingSystemTool/static/js/main.0f3255b3.chunk.js.map",
+    "main.js": "/LightingSystemTool/static/js/main.6b1fb824.chunk.js",
+    "main.js.map": "/LightingSystemTool/static/js/main.6b1fb824.chunk.js.map",
     "runtime-main.js": "/LightingSystemTool/static/js/runtime-main.04021287.js",
     "runtime-main.js.map": "/LightingSystemTool/static/js/runtime-main.04021287.js.map",
     "static/css/2.365bb4d8.chunk.css": "/LightingSystemTool/static/css/2.365bb4d8.chunk.css",
     "static/js/2.82f29b9c.chunk.js": "/LightingSystemTool/static/js/2.82f29b9c.chunk.js",
     "static/js/2.82f29b9c.chunk.js.map": "/LightingSystemTool/static/js/2.82f29b9c.chunk.js.map",
     "index.html": "/LightingSystemTool/index.html",
-    "precache-manifest.4f622f91150bc744b957b1157a028922.js": "/LightingSystemTool/precache-manifest.4f622f91150bc744b957b1157a028922.js",
+    "precache-manifest.d247f44f21109d649c3c5c18dbf8f01c.js": "/LightingSystemTool/precache-manifest.d247f44f21109d649c3c5c18dbf8f01c.js",
     "service-worker.js": "/LightingSystemTool/service-worker.js",
     "static/css/2.365bb4d8.chunk.css.map": "/LightingSystemTool/static/css/2.365bb4d8.chunk.css.map",
     "static/css/main.daf3b01c.chunk.css.map": "/LightingSystemTool/static/css/main.daf3b01c.chunk.css.map",
@@ -20,6 +20,6 @@
     "static/css/2.365bb4d8.chunk.css",
     "static/js/2.82f29b9c.chunk.js",
     "static/css/main.daf3b01c.chunk.css",
-    "static/js/main.0f3255b3.chunk.js"
+    "static/js/main.6b1fb824.chunk.js"
   ]
 }

@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "eb0b7b7386d2e8a0d51b4b36d4762c0b",
+    "revision": "9be0f28b03b12f6ab3c8ab91d783f80b",
     "url": "/LightingSystemTool/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/LightingSystemTool/static/css/2.365bb4d8.chunk.css"
   },
   {
-    "revision": "1a911dd8b0478b0059cd",
+    "revision": "00809c3999654521a3c7",
     "url": "/LightingSystemTool/static/css/main.daf3b01c.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/LightingSystemTool/static/js/2.82f29b9c.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "1a911dd8b0478b0059cd",
-    "url": "/LightingSystemTool/static/js/main.0f3255b3.chunk.js"
+    "revision": "00809c3999654521a3c7",
+    "url": "/LightingSystemTool/static/js/main.6b1fb824.chunk.js"
   },
   {
     "revision": "b019b2b6b9c2407d0afb",
