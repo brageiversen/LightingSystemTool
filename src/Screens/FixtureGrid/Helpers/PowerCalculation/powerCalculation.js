@@ -127,20 +127,30 @@ export const calculatePower = (rows, dimmerAddressAndUniverse) => {
 };
 
 export const printPower = (p) => {
+
+  let power = p; 
+
+  for(let entry in power){
+    const value = power[entry]; 
+    if(isNaN(value)){
+      power[entry] = 0; 
+    }
+  }
+
   return (
     <div>
       <ul>
         <li>
-          L1: <b>{p.phase1} W</b> ({p.phase1Frac}%)
+          L1: <b>{power.phase1} W</b> ({power.phase1Frac}%)
         </li>
         <li>
-          L2: <b>{p.phase2} W</b> ({p.phase2Frac}%)
+          L2: <b>{power.phase2} W</b> ({power.phase2Frac}%)
         </li>
         <li>
-          L3: <b>{p.phase3} W</b> ({p.phase3Frac}%)
+          L3: <b>{power.phase3} W</b> ({power.phase3Frac}%)
         </li>
         <li>
-          Total: <b>{p.total} W</b>
+          Total: <b>{power.total} W</b>
         </li>
       </ul>
     </div>
